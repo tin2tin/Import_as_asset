@@ -35,7 +35,7 @@ from bpy.props import CollectionProperty
 
 
 class OPERATOR_OT_import_as_assets(Operator, ImportHelper):
-    """Import Movie, Sound and Image files as Assets"""
+    """Import movie, sound and image files as Assets"""
 
     bl_idname = "sequencer.import_as_asset"
     bl_label = "Import as Asset"
