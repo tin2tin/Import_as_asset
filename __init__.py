@@ -21,7 +21,7 @@ bl_info = {
     "author": "tintwotin",
     "version": (1, 0),
     "blender": (3, 00, 0),
-    "location": "Add > Import as Asset",
+    "location": "Add > Import Asset",
     "description": "",
     "warning": "",
     "doc_url": "",
@@ -38,7 +38,7 @@ class OPERATOR_OT_import_as_assets(Operator, ImportHelper):
     """Import movie, sound and image files as Assets"""
 
     bl_idname = "sequencer.import_as_asset"
-    bl_label = "Import as Asset"
+    bl_label = "Import Asset"
     bl_options = {"REGISTER", "UNDO"}
 
     files: CollectionProperty(type=bpy.types.PropertyGroup)
