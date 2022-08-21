@@ -37,15 +37,6 @@ from bpy.types import (
 )
 
 
-class SEQUENCER_MT_assets(Menu):
-    bl_label = "Assets"
-    bl_idname = "sequencer.assets_menu"
-
-    def draw(self, _context):
-        layout = self.layout
-        layout.operator("sequencer.import_as_asset")
-
-
 class OPERATOR_OT_import_as_assets(Operator, ImportHelper):
     """Import as Assets"""
 
@@ -165,9 +156,7 @@ def menu_append(self, context):
 
 def register():
     bpy.utils.register_class(OPERATOR_OT_import_as_assets)
-    bpy.utils.register_class(SEQUENCER_MT_assets)
     bpy.types.SEQUENCER_MT_add.append(menu_append)
-    bpy.types.SEQUENCER_MT_editor_menus.append(SEQUENCER_MT_assets)
 
 
 def unregister():
@@ -177,4 +166,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-    bpy.ops.sequencer.import_as_asset("INVOKE_DEFAULT")
