@@ -32,24 +32,21 @@ import bpy, os
 from bpy.types import Operator
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import CollectionProperty
-from bpy.types import (
-    Menu,
-)
 
 
 class OPERATOR_OT_import_as_assets(Operator, ImportHelper):
-    """Import as Assets"""
+    """Import Movie, Sound and Image files as Assets"""
 
     bl_idname = "sequencer.import_as_asset"
     bl_label = "Import as Asset"
     bl_options = {"REGISTER", "UNDO"}
 
-    files: CollectionProperty(type=bpy.types.PropertyGroup)  # Stores properties
+    files: CollectionProperty(type=bpy.types.PropertyGroup)
 
     def draw(self, context):
         st = context.space_data
         params = st.params
-        if params:
+        if params:  # find a better way, this makes them unchangeable!
             params.use_filter = True
             params.use_filter_movie = True
             params.use_filter_sound = True
@@ -82,7 +79,6 @@ class OPERATOR_OT_import_as_assets(Operator, ImportHelper):
                 ".mka",
             }:
                 my_sound = bpy.data.sounds.load(path)
-                # print("Sound Path: "+sound_path)
                 bpy.ops.asset.mark({"id": my_sound})
             if file_extension in {
                 ".png",
@@ -151,7 +147,7 @@ class OPERATOR_OT_import_as_assets(Operator, ImportHelper):
 def menu_append(self, context):
     layout = self.layout
     layout.separator()
-    layout.operator(OPERATOR_OT_import_as_assets.bl_idname)
+    layout.operator(OPERATOR_OT_import_as_assets.bl_idname, icon="ASSET_MANAGER")
 
 
 def register():
