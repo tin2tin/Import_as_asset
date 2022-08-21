@@ -9,5 +9,6 @@ To get it working, you'll need use Blender 3.4+ beta and to go to Preferences > 
 ## Where?
 You'll find the function exposed in the Sequencer > Menus > Add > Import as Asset. 
 
+## Demo
 https://user-images.githubusercontent.com/1322593/185803855-ffdb053d-5b96-4b7e-a80e-9ff16dee8c05.mp4
 
