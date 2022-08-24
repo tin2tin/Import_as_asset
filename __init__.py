@@ -53,7 +53,6 @@ class OPERATOR_OT_import_as_assets(Operator, ImportHelper):
             params.use_filter_image = True
 
     def execute(self, context):
-
         dirname = os.path.dirname(self.filepath)
 
         for f in self.files:
