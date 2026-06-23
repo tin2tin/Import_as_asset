@@ -19,19 +19,20 @@
 bl_info = {
     "name": "Import as Asset",
     "author": "tintwotin",
-    "version": (1, 0),
-    "blender": (3, 00, 0),
+    "version": (1, 1),
+    "blender": (5, 2, 0),
     "location": "Add > Import as Asset",
-    "description": "",
+    "description": "Import movie, sound and image files as Assets",
     "warning": "",
     "doc_url": "",
     "category": "Sequencer",
 }
 
-import bpy, os
-from bpy.types import Operator
+import bpy
+import os
+from bpy.types import Operator, OperatorFileListElement
 from bpy_extras.io_utils import ImportHelper
-from bpy.props import CollectionProperty
+from bpy.props import CollectionProperty, StringProperty
 
 
 class OPERATOR_OT_import_as_assets(Operator, ImportHelper):
@@ -41,105 +42,70 @@ class OPERATOR_OT_import_as_assets(Operator, ImportHelper):
     bl_label = "Import as Asset"
     bl_options = {"REGISTER", "UNDO"}
 
-    files: CollectionProperty(type=bpy.types.PropertyGroup)
+    directory: StringProperty(subtype='DIR_PATH')
+    files: CollectionProperty(type=OperatorFileListElement)
 
     def draw(self, context):
         st = context.space_data
         params = st.params
-        if params:  # find a better way, this makes them unchangeable!
+        if params:
             params.use_filter = True
             params.use_filter_movie = True
             params.use_filter_sound = True
             params.use_filter_image = True
 
     def execute(self, context):
-        dirname = os.path.dirname(self.filepath)
+        # Resolve import directory path robustly
+        dirname = self.directory if self.directory else os.path.dirname(self.filepath)
 
         for f in self.files:
             path = os.path.join(dirname, f.name)
             path = bpy.path.abspath(path)
-            print(path)
-            file_name, file_extension = os.path.splitext(path)
+            print(f"Importing: {path}")
+            
+            _, file_extension = os.path.splitext(path)
+            file_extension = file_extension.lower()
 
+            # --- SOUND FILES ---
             if file_extension in {
-                ".wav",
-                ".ogg",
-                ".oga",
-                ".mp3",
-                ".mp2",
-                ".ac3",
-                ".aac",
-                ".flac",
-                ".wma",
-                ".eac3",
-                ".aif",
-                ".aiff",
-                ".m4a",
-                ".mka",
+                ".wav", ".ogg", ".oga", ".mp3", ".mp2", ".ac3", ".aac",
+                ".flac", ".wma", ".eac3", ".aif", ".aiff", ".m4a", ".mka",
             }:
-                my_sound = bpy.data.sounds.load(path)
-                bpy.ops.asset.mark({"id": my_sound})
+                try:
+                    my_sound = bpy.data.sounds.load(path)
+                    my_sound.asset_mark()
+                    my_sound.asset_generate_preview()
+                except Exception as e:
+                    self.report({'WARNING'}, f"Failed to load sound: {f.name} ({e})")
+
+            # --- IMAGE FILES ---
             if file_extension in {
-                ".png",
-                ".tga",
-                ".bmp",
-                ".jpg",
-                ".jpeg",
-                ".sgi",
-                ".rgb",
-                ".rgba",
-                ".tif",
-                ".tiff",
-                ".tx",
-                ".jp2",
-                ".j2c",
-                ".hdr",
-                ".dds",
-                ".dpx",
-                ".cin",
-                ".exr",
-                ".psd",
-                ".pdd",
-                ".psb",
+                ".png", ".tga", ".bmp", ".jpg", ".jpeg", ".sgi", ".rgb",
+                ".rgba", ".tif", ".tiff", ".tx", ".jp2", ".j2c", ".hdr",
+                ".dds", ".dpx", ".cin", ".exr", ".psd", ".pdd", ".psb",
                 ".webp",
-                ".psd",
-                ".pdd",
-                ".psb",
             }:
-                my_image = bpy.data.images.load(path)
-                bpy.ops.asset.mark({"id": my_image})
+                try:
+                    my_image = bpy.data.images.load(path)
+                    my_image.asset_mark()
+                    my_image.asset_generate_preview()
+                except Exception as e:
+                    self.report({'WARNING'}, f"Failed to load image: {f.name} ({e})")
+
+            # --- MOVIE FILES ---
             if file_extension in {
-                ".avi",
-                ".flc",
-                ".mov",
-                ".movie",
-                ".mp4",
-                ".m4v",
-                ".m2v",
-                ".m2t",
-                ".m2ts",
-                ".mts",
-                ".ts",
-                ".mv",
-                ".avs",
-                ".wmv",
-                ".ogv",
-                ".ogg",
-                ".r3d",
-                ".dv",
-                ".mpeg",
-                ".mpg",
-                ".mpg2",
-                ".vob",
-                ".mkv",
-                ".flv",
-                ".divx",
-                ".xvid",
-                ".mxf",
-                ".webm",
+                ".avi", ".flc", ".mov", ".movie", ".mp4", ".m4v", ".m2v",
+                ".m2t", ".m2ts", ".mts", ".ts", ".mv", ".avs", ".wmv",
+                ".ogv", ".ogg", ".r3d", ".dv", ".mpeg", ".mpg", ".mpg2",
+                ".vob", ".mkv", ".flv", ".divx", ".xvid", ".mxf", ".webm",
             }:
-                my_movie = bpy.data.movieclips.load(path)
-                bpy.ops.asset.mark({"id": my_movie})
+                try:
+                    my_movie = bpy.data.movieclips.load(path)
+                    my_movie.asset_mark()
+                    my_movie.asset_generate_preview()
+                except Exception as e:
+                    self.report({'WARNING'}, f"Failed to load movie clip: {f.name} ({e})")
+
         return {"FINISHED"}
 
 
